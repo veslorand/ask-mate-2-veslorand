@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <title>Answer list</title>
+{% endblock %}
+{% block body %}
+    <table border="1" width="1000" class="answer_table">
+        <thead>
+        <tr>
+            <th>{{ question['title'] }}</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>{{ question['message'] }}</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <table border="1" width="1000" class="answer_tablee">
+        <thead>
+        <tr>
+            {% for i in header %}
+                {% if i == "id" %}
+                    {{ continue }}
+                {% elif i == "question_id" %}
+                    {{ continue }}
+                {% else %}
+                    <th>{{ i }}</th>
+                {% endif %}
+            {% endfor %}
+        </tr>
+        </thead>
+
+        <tbody>
+        {% for answer_dict in all_answer %}
+            <tr>
+                {% if answer_dict['question_id'] == question['id'] %}
+                    {% for answer_key in answer_dict.items() %}
+                        {% if answer_key[0] == 'id' %}
+                            {{ continue }}
+                            {% elif answer_key[0] == 'question_id' %}
+                            {{ continue }}
+                            {% else %}
+                        <td>
+                            {{ answer_key[1] }}
+                            {% endif %}
+                            {% if answer_key[0] == 'message' %}
+                                <a href="/answer/{{ answer_dict['id'] }}/delete">(del)</a>
+                            {% elif answer_key[0] == 'vote_number' %}
+                                <a href="/answer/{{ answer_dict['id'] }}/vote-up">(▲)</a>
+                                <a href="/answer/{{ answer_dict['id'] }}/vote-down">(▼)</a>
+
+                            {% endif %}
+                        </td>
+
+                    {% endfor %}
+                {% endif %}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <a href="/question/{{ question['id'] }}/new-answer">New answer</a>
+    <a href="/">Back to questions</a><br>
+{% endblock %}

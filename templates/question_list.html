@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <title>Heroes of Code&Cool 3</title>
+{% endblock %}
+{% block body %}
+    <table id="table">
+        <thead>
+        <tr>
+            {% for i in header %}
+                {% if not loop.first %}
+                    <th>{{ i }}
+                    <a href="{{ url_for('list_questions', order_direction="desc", order_by=i) }}" class="link">▼</a>
+                    <a href="{{ url_for('list_questions', order_direction="asc", order_by=i) }}" class="link">▲</a>
+                {% endif %}
+            {% endfor %}
+        </tr>
+        </thead>
+
+        <tbody>
+        {% for question_dict in all_question %}
+            <tr id="body">
+                {% for i in question_dict.items() %}
+                    {% if loop.first %}
+                        {{ continue }}
+                    {% elif i[0] == "image" %}
+                        <td>
+                            <img src="/static/{{ i[1] }}" width="50" alt="joker">
+                        </td>
+                    {% elif i[0] == "vote_number" %}
+                        <td>
+                            {{ question_dict['vote_number'] }}
+                            <a href="/question/{{ question_dict['id'] }}/vote-up" id="">(▲)</a>
+                            <a href="/question/{{ question_dict['id'] }}/vote-down">(▼)</a>
+                        </td>
+                    {% elif i[0] != "title" %}
+                        <td>
+                            {{ i[1] }}
+                        </td>
+
+                    {% else %}
+                        <td>
+                            <a href="/question/{{ question_dict['id'] }}">{{ question_dict['title'] }}</a>
+                            <a href="/question/{{ question_dict['id'] }}/edit">(edit)</a>
+                            <a href="/question/{{ question_dict['id'] }}/delete">(del)</a>
+                        </td>
+                    {% endif %}
+                {% endfor %}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
