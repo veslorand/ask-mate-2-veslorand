@@ -169,7 +169,7 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-
+@database_common.connection_handler
 def add_new_comment(question_id, answer_id, message):
     # cursor.execute("""
     # INSERT INTO comment (question_id, answer_id, message, sumbission_time, edited_count)

@@ -71,3 +71,6 @@ def sort_the_questions(all_question, order_by, order_direction):
     except:
         sorted_questions = sorted(all_question, key=lambda i: i[basic_sort])
     return sorted_questions
+
+def execute_dml_statement(statement, variables=None):
+    pass
