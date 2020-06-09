@@ -1,11 +1,14 @@
-import datetime
+from datetime import datetime
 import os
 import uuid
+import time
+
 
 from psycopg2.extras import RealDictCursor
 
 import connection
 import database_common
+
 
 DATA_FOLDER_PATH = os.getenv('DATA_FOLDER_PATH') if 'DATA_FOLDER_PATH' in os.environ else './'
 QUESTION_FILE = DATA_FOLDER_PATH + "question.csv"
@@ -13,6 +16,7 @@ ANSWER_FILE = DATA_FOLDER_PATH + "answer.csv"
 QUESTIONS_HEADER = ['id', 'submission_time', 'view_number', 'vote_number', 'title', 'message', 'image']
 ANSWERS_HEADER = ['id', 'submission_time', 'vote_number', 'question_id', 'message', 'image']
 ALLOWED_EXTENSIONS = {'png', 'jpg'}
+
 
 @database_common.connection_handler
 def get_all_question(cursor: RealDictCursor):
@@ -31,7 +35,7 @@ def get_questions_by_id(cursor: RealDictCursor, id):
             FROM question
             WHERE id=%(id)s"""
     cursor.execute(query, {'id': id})
-    return cursor.fetchall()
+    return cursor.fetchone()
 
 
 @database_common.connection_handler
@@ -44,6 +48,7 @@ def get_answer_by_id(cursor: RealDictCursor, id) -> list:
     cursor.execute(query, {'id': id})
     return cursor.fetchall()
 
+
 @database_common.connection_handler
 def get_all_answer(cursor: RealDictCursor) -> list:
     query = """
@@ -53,12 +58,16 @@ def get_all_answer(cursor: RealDictCursor) -> list:
     cursor.execute(query)
     return cursor.fetchall()
 
+
 @database_common.connection_handler
-def find_answer_by_id(id, file_name):
-    answer = connection.read_csv_file(file_name)
-    for dic in answer:
-        if id in dic['id']:
-            return dic
+def insert_to_database(cursor: RealDictCursor, new_question):
+    query = """
+        INSERT INTO question
+        VALUES ('question_id_seq'::regclass, %(submission_time)s, %(view_number)s, %(vote_number)s, %(title)s, %(message)s, %(image)s)
+        """
+    cursor.execute(query, {'submission_time': new_question['submission_time'], 'view_number': new_question['view_number'],
+                           'vote_number': new_question['vote_number'], 'title': new_question['title'],
+                           'message': new_question['message'], 'image': new_question['image']})
 
 
 def get_random_id():
@@ -66,20 +75,32 @@ def get_random_id():
 
 
 def get_date_time():
-    time = datetime.datetime.now()
-    return str(time)
+    timee = time.ctime()
+    return timee
 
 
-def create_question_form(generator, filename):  # 'id', 'submission_time', 'view_number', 'vote_number', 'title', 'message', 'image'
-    my_list = [get_random_id(), get_date_time(), '0', '0', filename]
-    print(my_list)
-    title_and_message = [i for i in generator]
-    for ins in title_and_message[::-1]:
-        my_list.insert(4, ins)
-    return my_list
+@database_common.connection_handler
+def sort_all_question(cursor: RealDictCursor, request) -> list:
+    query = f"""
+        SELECT *
+        FROM question
+        ORDER BY {request.args.get('order_by')} {request.args.get('order_direction')}"""
+    cursor.execute(query)#, {'order_by': request.args.get('order_by'), 'order_direction': request.args.get('order_direction')})
+    return cursor.fetchall()
 
 
-def create_answer_form(generator, question_id):  # 'id', 'submission_time', 'vote_number', 'question_id', 'message', 'image'
+
+def create_question_form(request, image_filename):  # 'id', 'submission_time', 'view_number', 'vote_number', 'title', 'message', 'image'
+    my_dict = {'submission_time': get_date_time(), 'view_number': 0, 'vote_number': 0, 'image': image_filename,
+               'title': request.values.get('title'), 'message': request.values.get('message')}
+    # my_list = [get_random_id(), get_date_time(), '0', '0', image_filename]
+    # my_list.insert(4, request.values.get('new_question_title'))
+    # my_list.insert(5, request.values.get('new_question_message'))
+    return my_dict
+
+
+def create_answer_form(generator,
+                       question_id):  # 'id', 'submission_time', 'vote_number', 'question_id', 'message', 'image'
     my_list = [get_random_id(), get_date_time(), '0', question_id, '']
     title_and_message = [i for i in generator]
     for ins in title_and_message:

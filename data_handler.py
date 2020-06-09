@@ -9,16 +9,6 @@ import connection
 import database_common
 
 
-@database_common.connection_handler
-def get_mentors(cursor: RealDictCursor) -> list:
-    query = """
-        SELECT first_name, last_name, city
-        FROM mentor
-        ORDER BY first_name"""
-    cursor.execute(query)
-    return cursor.fetchall()
-
-
 DATA_FOLDER_PATH = os.getenv('DATA_FOLDER_PATH') if 'DATA_FOLDER_PATH' in os.environ else './'
 QUESTION_FILE = DATA_FOLDER_PATH + "question.csv"
 ANSWER_FILE = DATA_FOLDER_PATH + "answer.csv"
