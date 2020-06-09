@@ -4,6 +4,7 @@ import uuid
 from typing import List, Dict
 
 from psycopg2 import sql
+from psycopg2._psycopg import cursor
 from psycopg2.extras import RealDictCursor
 import connection
 import database_common
@@ -33,7 +34,6 @@ def get_questions_by_id(id, file_name):
     for dictionary in question:
         if id == dictionary['id']:
             return dictionary
-
 
 
 @database_common.connection_handler
@@ -82,7 +82,8 @@ def get_date_time():
 
 
 @database_common.connection_handler
-def create_question_form(generator, filename):  # 'id', 'submission_time', 'view_number', 'vote_number', 'title', 'message', 'image'
+def create_question_form(generator,
+                         filename):  # 'id', 'submission_time', 'view_number', 'vote_number', 'title', 'message', 'image'
     my_list = [get_random_id(), get_date_time(), '0', '0', filename]
     print(my_list)
     title_and_message = [i for i in generator]
@@ -92,7 +93,8 @@ def create_question_form(generator, filename):  # 'id', 'submission_time', 'view
 
 
 @database_common.connection_handler
-def create_answer_form(generator, question_id):  # 'id', 'submission_time', 'vote_number', 'question_id', 'message', 'image'
+def create_answer_form(generator,
+                       question_id):  # 'id', 'submission_time', 'vote_number', 'question_id', 'message', 'image'
     my_list = [get_random_id(), get_date_time(), '0', question_id, '']
     title_and_message = [i for i in generator]
     for ins in title_and_message:
@@ -169,3 +171,24 @@ def vote_down_answer(answer_id, file_name):
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+def add_new_comment(question_id, answer_id, message):
+    # cursor.execute("""
+    # INSERT INTO comment (question_id, answer_id, message, sumbission_time, edited_count)
+    # VALUE (%(question_id)s, %(answer_id)s, %(message)s, %(submission_time)s, 0);
+    # """,
+    # {"question_id": question_id},
+    # {"answer_id": answer_id},
+    # {"message": message},
+    # {"submission_time": get_date_time()}
+    # )
+
+    quesry = \
+        """
+    INSERT INTO comment (question_id, answer_id, message, submission_time, edited_count) 
+    VALUE (%(question_id)s, %(answer_id)s, %(message)s, %(submission_time)s, 0)
+    """
+    params = {"question_id": question_id, "answer_id": answer_id, "message": message,
+              "submission_time": get_date_time()}
+    cursor.execute(quesry, params)
