@@ -3,7 +3,7 @@ from flask import Flask, render_template, request, redirect, url_for
 from werkzeug.utils import secure_filename
 
 import connection
-import data_handler
+import data_handler_sql as data_handler
 import os
 
 app = Flask(__name__)
@@ -15,19 +15,16 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 @app.route("/list")
 def list_questions():
     all_question = data_handler.get_all_question()
-    sorted_questions = connection.sort_the_questions(all_question, request.args.get('order_by'),
-                                                     request.args.get('order_direction'))
-    return render_template("question_list.html", all_question=sorted_questions,
+    return render_template("question_list.html", all_question=all_question,
                            header=data_handler.QUESTIONS_HEADER)
 
 
 @app.route("/question/<question_id>")
 def question(question_id):
-    question_by_id = data_handler.get_questions_by_id(question_id, data_handler.QUESTION_FILE)
+    question_by_id = data_handler.get_questions_by_id(question_id)
     all_answer = data_handler.get_all_answer()
-    sorted_answer_by_vote = sorted(all_answer, key=lambda i: i['vote_number'], reverse=True)
     return render_template("answer_list.html", question=question_by_id, header=data_handler.ANSWERS_HEADER,
-                           all_answer=sorted_answer_by_vote)
+                           all_answer=all_answer)
 
 
 @app.route('/add_new_question', methods=['POST', 'GET'])
