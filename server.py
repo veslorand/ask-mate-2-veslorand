@@ -6,7 +6,6 @@ import connection
 import data_handler_sql as data_handler
 import os
 
-
 app = Flask(__name__)
 UPLOAD_FOLDER = '/home/veslorandpc/Desktop/projects/Ask_mate_1/static'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -15,6 +14,10 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 @app.route("/")
 @app.route("/list")
 def list_questions():
+    if request.args:
+        all_question = data_handler.sort_all_question(request)
+        return render_template("question_list.html", all_question=all_question,
+                               header=data_handler.QUESTIONS_HEADER)
     all_question = data_handler.get_all_question()
     return render_template("question_list.html", all_question=all_question,
                            header=data_handler.QUESTIONS_HEADER)
@@ -26,6 +29,7 @@ def question(question_id):
     all_answer = data_handler.get_all_answer()
     return render_template("answer_list.html", question=question_by_id, header=data_handler.ANSWERS_HEADER,
                            all_answer=all_answer)
+
 
 @app.route('/add_new_question', methods=['POST', 'GET'])
 def add_new_question():
@@ -41,11 +45,10 @@ def add_new_question():
         if file and data_handler.allowed_file(file.filename):
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        new_question_data = data_handler.create_question_form(request.form.values(), filename)
-        connection.append_csv_file(data_handler.QUESTION_FILE, new_question_data)
-        return redirect("/question/" + new_question_data[0])
+            new_question_data = data_handler.create_question_form(request, filename)
+            data_handler.insert_to_database(new_question_data)
+            return redirect("/question/" + str(new_question_data.get('id')))
     return render_template("add_new_question.html", header=data_handler.QUESTIONS_HEADER)
-
 
 
 @app.route('/question/<question_id>/new-answer', methods=['POST', 'GET'])
@@ -57,12 +60,14 @@ def add_new_answer(question_id):
         return redirect('/question/' + question_id)
     return render_template("add_new_answer.html", header=data_handler.ANSWERS_HEADER)
 
+
 @app.route('/question/<question_id>/new_question_comment', methods=['POST'])
 def add_new_question_comment(question_id, answer_id, message):
-    #get comment from request
-    #send to database
+    # get comment from request
+    # send to database
     data_handler.add_new_comment(question_id, answer_id, message)
     return render_template("add_new_comment.html", header=data_handler.QUESTIONS_HEADER)
+
 
 @app.route('/question/<question_id>/delete')
 def delete_question(question_id):
@@ -77,7 +82,7 @@ def delete_question(question_id):
 def delete_answer(answer_id):
     all_answer = data_handler.get_all_answer()
     connection.write_csv_file(data_handler.ANSWER_FILE, all_answer, data_handler.ANSWERS_HEADER, answer_id)
-    return redirect('/')#f'/question/{all_answer["question_id"]}')
+    return redirect('/')  # f'/question/{all_answer["question_id"]}')
 
 
 @app.route('/question/<question_id>/vote-up')
@@ -132,8 +137,8 @@ def speak():
             try:
                 text = r.recognize_google(audio)  # language="hu-HU"
                 print(f"You said: {text}")
-                if "home" in text:                                                              # IN Everywhere
-                    return redirect(url_for("list_questions"))                                  # TO Home
+                if "home" in text:  # IN Everywhere
+                    return redirect(url_for("list_questions"))  # TO Home
                 elif "sort" in text:
                     print("sort")
                     if "time" in text:
@@ -162,21 +167,20 @@ def speak():
                         else:
                             return redirect("http://0.0.0.0:8000/list?order_direction=asc&order_by=message")
 
-                elif "question" in text:                                                    # IN Everywhere
-                    return redirect(url_for("add_new_question"))                                # TO Home
+                elif "question" in text:  # IN Everywhere
+                    return redirect(url_for("add_new_question"))  # TO Home
 
-                elif request.environ['HTTP_REFERER'] in "http://0.0.0.0:8000/add_new_question": # IN Add new question
-                    if "back" in text:                                                          # TO Back to Home
+                elif request.environ['HTTP_REFERER'] in "http://0.0.0.0:8000/add_new_question":  # IN Add new question
+                    if "back" in text:  # TO Back to Home
                         return redirect(url_for("list_questions"))
 
-                elif "new-answer" in request.environ['HTTP_REFERER']:                           # IN New answer
-                    if "back" in text:                                                          # TO Back question
+                elif "new-answer" in request.environ['HTTP_REFERER']:  # IN New answer
+                    if "back" in text:  # TO Back question
                         return redirect(request.environ['HTTP_REFERER'][:-11])
 
-                elif "question" in request.environ['HTTP_REFERER']:         # IN Question
-                    if "answer" in text:                                                           # TO New answer
+                elif "question" in request.environ['HTTP_REFERER']:  # IN Question
+                    if "answer" in text:  # TO New answer
                         return redirect(request.environ['HTTP_REFERER'] + "/new-answer")
-
 
                 print("Szeva")
                 return redirect('/')
