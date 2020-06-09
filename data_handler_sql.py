@@ -2,7 +2,10 @@ import datetime
 import os
 import uuid
 
+from psycopg2.extras import RealDictCursor
+
 import connection
+import database_common
 
 DATA_FOLDER_PATH = os.getenv('DATA_FOLDER_PATH') if 'DATA_FOLDER_PATH' in os.environ else './'
 QUESTION_FILE = DATA_FOLDER_PATH + "question.csv"
@@ -11,37 +14,46 @@ QUESTIONS_HEADER = ['id', 'submission_time', 'view_number', 'vote_number', 'titl
 ANSWERS_HEADER = ['id', 'submission_time', 'vote_number', 'question_id', 'message', 'image']
 ALLOWED_EXTENSIONS = {'png', 'jpg'}
 
-
-def get_questions_by_id(id, file_name):
-    question = connection.read_csv_file(file_name)
-    for dictionary in question:
-        if id == dictionary['id']:
-            return dictionary
-
-
-def get_answer_by_id(id, file_name):
-    answer = connection.read_csv_file(file_name)
-    for dict in answer:
-        if id == dict['id']:
-            return dict
+@database_common.connection_handler
+def get_all_question(cursor: RealDictCursor):
+    query = """
+            SELECT *
+            FROM question
+            ORDER BY submission_time"""
+    cursor.execute(query)
+    return cursor.fetchall()
 
 
-def get_all_question():
-    try:
-        return connection.read_csv_file(QUESTION_FILE)
-    except FileNotFoundError:
-        print("except")
-        return []
+@database_common.connection_handler
+def get_questions_by_id(cursor: RealDictCursor, id):
+    query = """
+            SELECT *
+            FROM question
+            WHERE id=%(id)s"""
+    cursor.execute(query, {'id': id})
+    return cursor.fetchall()
 
 
-def get_all_answer():
-    try:
-        return connection.read_csv_file(ANSWER_FILE)
-    except FileNotFoundError:
-        print("except")
-        return []
+@database_common.connection_handler
+def get_answer_by_id(cursor: RealDictCursor, id) -> list:
+    query = """
+        SELECT *
+        FROM answer
+        WHERE question_id=%(id)s
+        ORDER BY submission_time"""
+    cursor.execute(query, {'id': id})
+    return cursor.fetchall()
 
+@database_common.connection_handler
+def get_all_answer(cursor: RealDictCursor) -> list:
+    query = """
+        SELECT *
+        FROM answer
+        ORDER BY submission_time"""
+    cursor.execute(query)
+    return cursor.fetchall()
 
+@database_common.connection_handler
 def find_answer_by_id(id, file_name):
     answer = connection.read_csv_file(file_name)
     for dic in answer:
