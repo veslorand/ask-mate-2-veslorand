@@ -6,6 +6,7 @@ import connection
 import data_handler_sql as data_handler
 import os
 
+
 app = Flask(__name__)
 UPLOAD_FOLDER = '/home/veslorandpc/Desktop/projects/Ask_mate_1/static'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
