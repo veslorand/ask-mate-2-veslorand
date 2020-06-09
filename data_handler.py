@@ -168,24 +168,3 @@ def vote_down_answer(answer_id, file_name):
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-@database_common.connection_handler
-def add_new_comment(question_id, answer_id, message):
-    # cursor.execute("""
-    # INSERT INTO comment (question_id, answer_id, message, sumbission_time, edited_count)
-    # VALUE (%(question_id)s, %(answer_id)s, %(message)s, %(submission_time)s, 0);
-    # """,
-    # {"question_id": question_id},
-    # {"answer_id": answer_id},
-    # {"message": message},
-    # {"submission_time": get_date_time()}
-    # )
-
-    quesry = \
-        """
-    INSERT INTO comment (question_id, answer_id, message, submission_time, edited_count) 
-    VALUE (%(question_id)s, %(answer_id)s, %(message)s, %(submission_time)s, 0)
-    """
-    params = {"question_id": question_id, "answer_id": answer_id, "message": message,
-              "submission_time": get_date_time()}
-    cursor.execute(quesry, params)
