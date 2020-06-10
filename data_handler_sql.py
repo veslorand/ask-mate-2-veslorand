@@ -15,7 +15,7 @@ QUESTION_FILE = DATA_FOLDER_PATH + "question.csv"
 ANSWER_FILE = DATA_FOLDER_PATH + "answer.csv"
 QUESTIONS_HEADER = ['id', 'submission_time', 'view_number', 'vote_number', 'title', 'message', 'image']
 ANSWERS_HEADER = ['id', 'submission_time', 'vote_number', 'question_id', 'message', 'image']
-COMMENT_HEADER = ['id', 'question_id', 'answer_id', 'message', 'submission_time', 'edited_count']
+COMMENT_HEADER = ['id', 'question_id', 'answer_id', 'edited_count', 'message', 'submission_time']
 ALLOWED_EXTENSIONS = {'png', 'jpg'}
 
 
@@ -213,6 +213,13 @@ def add_new_comment(cursor: RealDictCursor, question_id, answer_id, message):
     cursor.execute(quesry, params)
 
 @database_common.connection_handler
-def get_comment_by_id(question_id):
+def get_comment_by_id(cursor: RealDictCursor, id) -> list:
+    query = """
+        SELECT *
+        FROM comment
+        WHERE question_id =%(id)s
+    """
+    cursor.execute(query, {'id': id})
+    return cursor.fetchall()
 
 
