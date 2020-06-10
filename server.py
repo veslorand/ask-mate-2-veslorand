@@ -70,7 +70,7 @@ def add_new_question_comment(question_id):
     # send to database
     if request.method == 'POST':
         data_handler.add_new_comment(question_id, request)
-        return redirect("/question/", header=data_handler.COMMENT_HEADER)
+        return redirect("/", header=data_handler.COMMENT_HEADER)
     return render_template('add_new_comment.html', header=data_handler.COMMENT_HEADER)
 
 @app.route('/question/<question_id>/delete')

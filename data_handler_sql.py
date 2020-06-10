@@ -204,8 +204,7 @@ def add_new_comment(cursor: RealDictCursor, request):
     # )
     question_id = request.values.get('question_id')
     answer_id = request.values.get('answer_id')
-   #if question_id:
-
+    message = request.values.get('message')
 
     query = \
         """
