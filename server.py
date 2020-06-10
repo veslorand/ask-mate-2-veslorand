@@ -37,20 +37,9 @@ def question(question_id):
 def add_new_question():
     # id,submission_time,view_number,vote_number,title,message,image
     if request.method == 'POST':
-        if 'file' not in request.files:  # todo IMAGE!
-            print('No file part')
-            return redirect(request.url)
-        file = request.files['file']
-        if file.filename == '':
-            print('No selected file')
-            return redirect(request.url)
-        if file and data_handler.allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            new_question_data = data_handler.create_question_form(request, filename)
-            new_id = data_handler.insert_to_database(new_question_data)
-
-            return redirect(f"/question/{new_id}")
+        new_question_data = data_handler.create_questions_form(request)
+        new_id = data_handler.insert_to_database_question(new_question_data)
+        return redirect(f"/question/{new_id}")
     return render_template("add_new_question.html", header=data_handler.QUESTIONS_HEADER)
 
 
@@ -58,10 +47,10 @@ def add_new_question():
 def add_new_answer(question_id):
     # id, submission_time, vote_number, question_id, message, image
     if request.method == 'POST':
-        new_answer_data = data_handler.create_answer_form(request.form.values(), question_id)
-        connection.append_csv_file(data_handler.ANSWER_FILE, new_answer_data)
+        new_answer_data = data_handler.create_answer_form(request, question_id)
+        data_handler.insert_to_database_answer(new_answer_data, question_id)
         return redirect('/question/' + question_id)
-    return render_template("add_new_answer.html", header=data_handler.ANSWERS_HEADER)
+    return render_template("add_new_answer.html", header=data_handler.ANSWERS_HEADER, question_id=question_id)
 
 
 @app.route('/question/<question_id>/new_comment', methods=['POST'])
@@ -80,9 +69,8 @@ def delete_question(question_id):
 
 @app.route('/answer/<answer_id>/delete')
 def delete_answer(answer_id):
-    all_answer = data_handler.get_all_answer()
-    connection.write_csv_file(data_handler.ANSWER_FILE, all_answer, data_handler.ANSWERS_HEADER, answer_id)
-    return redirect('/')  # f'/question/{all_answer["question_id"]}')
+    data_handler.delete_answers(answer_id)
+    return redirect(f'{request.environ.get("HTTP_REFERER")}')  # f'/question/{all_answer["question_id"]}')
 
 
 @app.route('/question/<question_id>/vote-up')
@@ -115,15 +103,12 @@ def vote_down_answer(answer_id):
 
 @app.route('/question/<question_id>/edit', methods=['POST', 'GET'])
 def edit_question(question_id):
-    question_by_id = data_handler.get_questions_by_id(question_id, data_handler.QUESTION_FILE)
+    question_by_id = data_handler.get_questions_by_id(question_id)
     if request.method == 'POST':
-        edited_question_data = data_handler.edit_question(request.form.items(), question_id)
-        all_question = data_handler.get_all_question()
-        connection.write_csv_file(data_handler.QUESTION_FILE, all_question, data_handler.QUESTIONS_HEADER, question_id)
-        connection.append_csv_file(data_handler.QUESTION_FILE, edited_question_data.values())
+        data_handler.edit_question(request, question_id)
         return redirect("/question/" + question_id)
-    return render_template("edit_question.html", question_id=question_id, message=question_by_id['message'],
-                           title=question_by_id['title'])
+    return render_template("edit_question.html", question_id=question_id, message=question_by_id.get('message'),
+                           title=question_by_id.get('title'))
 
 
 @app.route('/speak', methods=['POST', 'GET'])
