@@ -39,29 +39,39 @@
                     {% for answer_key in answer_dict.items() %}
                         {% if answer_key[0] == 'id' %}
                             {{ continue }}
-                            {% elif answer_key[0] == 'question_id' %}
+                        {% elif answer_key[0] == 'question_id' %}
                             {{ continue }}
-                            {% else %}
-                        <td>
+                        {% elif answer_key[0] == "image" %}
+                            <td>
+
+
+                                {% if answer_key[1] == None %}
+                                    {{ continue }}
+                                {% else %}
+                                    <img src="/static/{{ answer_key[1] }}" width="100" alt="picture">
+                                {% endif %}
+                            </td>
+                        {% else %}
+                            <td>
                             {{ answer_key[1] }}
-                            {% endif %}
-                            {% if answer_key[0] == 'message' %}
-                                <a href="/answer/{{ answer_dict['id'] }}/delete">(del)</a>
-                            {% elif answer_key[0] == 'vote_number' %}
-                                <a href="/answer/{{ answer_dict['id'] }}/vote-up">(▲)</a>
-                                <a href="/answer/{{ answer_dict['id'] }}/vote-down">(▼)</a>
-                                <a href="/answer/{{ answer_dict['id'] }}/commenr">Comment</a>
-                            {% endif %}
-                        </td>
+                        {% endif %}
+                    {% if answer_key[0] == 'message' %}
+                        <a href="/answer/{{ answer_dict['id'] }}/delete">(del)</a>
+                    {% elif answer_key[0] == 'vote_number' %}
+                        <a href="/answer/{{ answer_dict['id'] }}/vote-up">(▲)</a>
+                        <a href="/answer/{{ answer_dict['id'] }}/vote-down">(▼)</a>
+                        <a href="/answer/{{ answer_dict['id'] }}/comment">Comment</a>
+                    {% endif %}
+                    </td>
 
                     {% endfor %}
                 {% endif %}
             </tr>
         {% endfor %}
+    </table>
+    </tbody>
 
-        </tbody>
-
-        <table border="1" width="1000" class="comment_tablee">
+    <table border="1" width="1000" class="comment_table">
         <thead>
         <tr>
             {% for i in comment_header %}
@@ -85,17 +95,17 @@
                     {% for comment_key in comment.items() %}
                         {% if comment_key[0] == 'id' %}
                             {{ continue }}
-                            {% elif comment_key[0] == 'question_id' %}
+                        {% elif comment_key[0] == 'question_id' %}
                             {{ continue }}
-                            {% else %}
-                        <td>
+                        {% else %}
+                            <td>
                             {{ comment_key[1] }}
-                            {% endif %}
+                        {% endif %}
 
 
-                        </td>
+                    </td>
 
-                 {% endfor %}
+                    {% endfor %}
                 {% endif %}
             </tr>
         {% endfor %}
@@ -103,4 +113,4 @@
     </table>
     <a href="/question/{{ question['id'] }}/new-answer">New answer</a>
     <a href="/">Back to questions</a><br>
-    {% endblock %}
+{% endblock %}
