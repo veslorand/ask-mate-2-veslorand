@@ -24,9 +24,10 @@ def list_questions():
 def question(question_id):
     question_by_id = data_handler.get_questions_by_id(question_id)
     all_answer = data_handler.get_all_answer()
-    #comment_by_id = data_handler.get_comment_by_id(id)
+    comment_by_id = data_handler.get_comment_by_id(id)
     return render_template("answer_list.html", question=question_by_id, header=data_handler.ANSWERS_HEADER,
-                           all_answer=all_answer, comment_header=data_handler.COMMENT_HEADER)
+                           all_answer=all_answer, comment_header=data_handler.COMMENT_HEADER,
+                           comment_by_id=comment_by_id)
 
 @app.route('/add_new_question', methods=['POST', 'GET'])
 def add_new_question():
