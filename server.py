@@ -6,6 +6,7 @@ import connection
 import data_handler_sql as data_handler
 import os
 
+
 app = Flask(__name__)
 UPLOAD_FOLDER = '/home/veslorandpc/Desktop/projects/Ask_mate_1/static'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -27,8 +28,10 @@ def list_questions():
 def question(question_id):
     question_by_id = data_handler.get_questions_by_id(question_id)
     all_answer = data_handler.get_all_answer()
+    comment_by_id = data_handler.get_comment_by_id(id)
     return render_template("answer_list.html", question=question_by_id, header=data_handler.ANSWERS_HEADER,
-                           all_answer=all_answer)
+                           all_answer=all_answer, comment_header=data_handler.COMMENT_HEADER,
+                           comment_by_id=comment_by_id)
 
 
 @app.route('/add_new_question', methods=['POST', 'GET'])
@@ -51,6 +54,7 @@ def add_new_question():
     return render_template("add_new_question.html", header=data_handler.QUESTIONS_HEADER)
 
 
+
 @app.route('/question/<question_id>/new-answer', methods=['POST', 'GET'])
 def add_new_answer(question_id):
     # id, submission_time, vote_number, question_id, message, image
@@ -60,13 +64,12 @@ def add_new_answer(question_id):
         return redirect('/question/' + question_id)
     return render_template("add_new_answer.html", header=data_handler.ANSWERS_HEADER)
 
-
-@app.route('/question/<question_id>/new_question_comment', methods=['POST'])
+@app.route('/question/<question_id>/new_comment', methods=['POST'])
 def add_new_question_comment(question_id, answer_id, message):
     # get comment from request
     # send to database
     data_handler.add_new_comment(question_id, answer_id, message)
-    return render_template("add_new_comment.html", header=data_handler.QUESTIONS_HEADER)
+    return render_template("add_new_comment.html", header=data_handler.COMMENT_HEADER)
 
 
 @app.route('/question/<question_id>/delete')
@@ -137,8 +140,8 @@ def speak():
             try:
                 text = r.recognize_google(audio)  # language="hu-HU"
                 print(f"You said: {text}")
-                if "home" in text:  # IN Everywhere
-                    return redirect(url_for("list_questions"))  # TO Home
+                if "home" in text:                                                              # IN Everywhere
+                    return redirect(url_for("list_questions"))                                  # TO Home
                 elif "sort" in text:
                     print("sort")
                     if "time" in text:
@@ -181,6 +184,7 @@ def speak():
                 elif "question" in request.environ['HTTP_REFERER']:  # IN Question
                     if "answer" in text:  # TO New answer
                         return redirect(request.environ['HTTP_REFERER'] + "/new-answer")
+
 
                 print("Szeva")
                 return redirect('/')
