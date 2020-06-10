@@ -25,7 +25,11 @@
                         {{ continue }}
                     {% elif i[0] == "image" %}
                         <td>
-                            <img src="/static/{{ i[1] }}" width="50" alt="joker">
+                            {% if i[1] == None %}
+                                {{ continue }}
+                            {% else %}
+                                <img src="/static/{{ i[1] }}" width="50" alt="picture">
+                            {% endif %}
                         </td>
                     {% elif i[0] == "vote_number" %}
                         <td>
