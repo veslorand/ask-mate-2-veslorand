@@ -15,7 +15,7 @@ QUESTION_FILE = DATA_FOLDER_PATH + "question.csv"
 ANSWER_FILE = DATA_FOLDER_PATH + "answer.csv"
 QUESTIONS_HEADER = ['id', 'submission_time', 'view_number', 'vote_number', 'title', 'message', 'image']
 ANSWERS_HEADER = ['id', 'submission_time', 'vote_number', 'question_id', 'message', 'image']
-COMMENT_HEADER = ['id', 'question_id', 'answer_id', 'edited_count', 'message', 'submission_time']
+COMMENT_HEADER = ['id', 'question_id', 'answer_id',  'edited_count', 'message', 'submission_time']
 ALLOWED_EXTENSIONS = {'png', 'jpg'}
 
 
@@ -206,7 +206,7 @@ def add_new_comment(cursor: RealDictCursor, question_id, answer_id, message):
     quesry = \
         """
     INSERT INTO comment (question_id, answer_id, message, submission_time, edited_count) 
-    VALUE (%(question_id)s, %(answer_id)s, %(message)s, %(submission_time)s, 0)
+    VALUES (%(question_id)s, %(answer_id)s, %(message)s, %(submission_time)s, 0)
     """
     params = {"question_id": question_id, "answer_id": answer_id, "message": message,
               "submission_time": get_date_time()}
