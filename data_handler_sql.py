@@ -158,7 +158,6 @@ def edit_question(cursor: RealDictCursor, request, question_id):
             """
     cursor.execute(query, {'id': question_id, 'title': request.values.get('edited_question_title'),
                            'message': request.values.get('edited_question_message')})
-    return
 
 
 def create_questions_form(request):  # 'id', 'submission_time', 'view_number', 'vote_number', 'title', 'message', 'image'
@@ -188,54 +187,43 @@ def create_answer_form(request, question_id):  # 'id', 'submission_time', 'vote_
     return my_dict
 
 
-def vote_up_question(question_id, file_name):
-    question_dict = get_questions_by_id(question_id, file_name)
-    for item in question_dict.items():
-        if item[0] == "vote_number":
-            item = list(item)
-            item[1] = int(item[1]) + 1
-            question_dict['vote_number'] = item[1]
-            break
-    return question_dict
+@database_common.connection_handler
+def vote_up_question(cursor: RealDictCursor, question_id):
+    query = """
+                    UPDATE question
+                    SET vote_number = vote_number + 1
+                    WHERE id=%(id)s
+                """
+    cursor.execute(query, {'id': question_id})
+
+@database_common.connection_handler
+def vote_down_question(cursor: RealDictCursor, question_id):
+    query = """
+                    UPDATE question
+                    SET vote_number = vote_number - 1 
+                    WHERE id=%(id)s
+                """
+    cursor.execute(query, {'id': question_id})
 
 
-def vote_down_question(question_id, file_name):
-    question_dict = get_questions_by_id(question_id, file_name)
-    for item in question_dict.items():
-        if item[0] == "vote_number":
-            item = list(item)
-            if item[1] != '0':
-                item[1] = int(item[1]) - 1
-                question_dict['vote_number'] = item[1]
-                break
-            else:
-                pass
-    return question_dict
+@database_common.connection_handler
+def vote_up_answer(cursor: RealDictCursor, answer_id):
+    query = """
+                    UPDATE answer
+                    SET vote_number = vote_number + 1
+                    WHERE id=%(id)s
+                """
+    cursor.execute(query, {'id': answer_id})
 
 
-def vote_up_answer(answer_id, file_name):
-    answer_dict = get_answer_by_id(answer_id, file_name)
-    for item in answer_dict.items():
-        if item[0] == "vote_number":
-            item = list(item)
-            item[1] = int(item[1]) + 1
-            answer_dict['vote_number'] = item[1]
-            break
-    return answer_dict
-
-
-def vote_down_answer(answer_id, file_name):
-    answer_dict = get_answer_by_id(answer_id, file_name)
-    for item in answer_dict.items():
-        if item[0] == "vote_number":
-            item = list(item)
-            if item[1] != '0':
-                item[1] = int(item[1]) - 1
-                answer_dict['vote_number'] = item[1]
-                break
-            else:
-                pass
-    return answer_dict
+@database_common.connection_handler
+def vote_down_answer(cursor: RealDictCursor, answer_id):
+    query = """
+                    UPDATE answer
+                    SET vote_number = vote_number - 1 
+                    WHERE id=%(id)s
+                """
+    cursor.execute(query, {'id': answer_id})
 
 
 def allowed_file(filename):

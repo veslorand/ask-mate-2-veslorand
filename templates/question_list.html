@@ -34,8 +34,8 @@
                     {% elif i[0] == "vote_number" %}
                         <td>
                             {{ question_dict['vote_number'] }}
-                            <a href="/question/{{ question_dict['id'] }}/vote-up" id="">(▲)</a>
-                            <a href="/question/{{ question_dict['id'] }}/vote-down">(▼)</a>
+                            <a href="/question/{{ question_dict['id'] }}/vote-up" id="{{ question_dict['vote_number'] }}">(▲)</a>
+                            <a href="/question/{{ question_dict['id'] }}/vote-down" id="{{ question_dict['vote_number'] }}">(▼)</a>
                         </td>
                     {% elif i[0] != "title" %}
                         <td>
