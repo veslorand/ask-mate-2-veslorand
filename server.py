@@ -6,9 +6,8 @@ import connection
 import data_handler_sql as data_handler
 import os
 
-
 app = Flask(__name__)
-UPLOAD_FOLDER = '/home/veslorandpc/Desktop/projects/Ask_mate_1/static'
+UPLOAD_FOLDER = '/home/veslorandpc/Desktop/projects/ask-mate-2-python-Kunand/static'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
@@ -28,7 +27,7 @@ def list_questions():
 def question(question_id):
     question_by_id = data_handler.get_questions_by_id(question_id)
     all_answer = data_handler.get_all_answer()
-    comment_by_id = data_handler.get_comment_by_id(id)
+    comment_by_id = data_handler.get_comment_by_id(question_id)
     return render_template("answer_list.html", question=question_by_id, header=data_handler.ANSWERS_HEADER,
                            all_answer=all_answer, comment_header=data_handler.COMMENT_HEADER,
                            comment_by_id=comment_by_id)
@@ -49,10 +48,10 @@ def add_new_question():
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             new_question_data = data_handler.create_question_form(request, filename)
-            data_handler.insert_to_database(new_question_data)
-            return redirect("/question/" + str(new_question_data.get('id')))
-    return render_template("add_new_question.html", header=data_handler.QUESTIONS_HEADER)
+            new_id = data_handler.insert_to_database(new_question_data)
 
+            return redirect(f"/question/{new_id}")
+    return render_template("add_new_question.html", header=data_handler.QUESTIONS_HEADER)
 
 
 @app.route('/question/<question_id>/new-answer', methods=['POST', 'GET'])
@@ -64,6 +63,7 @@ def add_new_answer(question_id):
         return redirect('/question/' + question_id)
     return render_template("add_new_answer.html", header=data_handler.ANSWERS_HEADER)
 
+
 @app.route('/question/<question_id>/new_comment', methods=['POST'])
 def add_new_question_comment(question_id, answer_id, message):
     # get comment from request
@@ -74,10 +74,7 @@ def add_new_question_comment(question_id, answer_id, message):
 
 @app.route('/question/<question_id>/delete')
 def delete_question(question_id):
-    all_question = data_handler.get_all_question()
-    connection.write_csv_file(data_handler.QUESTION_FILE, all_question, data_handler.QUESTIONS_HEADER, question_id)
-    all_answer = data_handler.get_all_answer()
-    connection.write_csv_file(data_handler.ANSWER_FILE, all_answer, data_handler.ANSWERS_HEADER, question_id)
+    data_handler.delete_question_with_answers(question_id)
     return redirect("/")
 
 
@@ -140,8 +137,8 @@ def speak():
             try:
                 text = r.recognize_google(audio)  # language="hu-HU"
                 print(f"You said: {text}")
-                if "home" in text:                                                              # IN Everywhere
-                    return redirect(url_for("list_questions"))                                  # TO Home
+                if "home" in text:  # IN Everywhere
+                    return redirect(url_for("list_questions"))  # TO Home
                 elif "sort" in text:
                     print("sort")
                     if "time" in text:
@@ -184,7 +181,6 @@ def speak():
                 elif "question" in request.environ['HTTP_REFERER']:  # IN Question
                     if "answer" in text:  # TO New answer
                         return redirect(request.environ['HTTP_REFERER'] + "/new-answer")
-
 
                 print("Szeva")
                 return redirect('/')

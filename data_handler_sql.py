@@ -1,14 +1,14 @@
-import datetime
+from datetime import datetime
 import os
 import uuid
 import time
 
 
-from psycopg2._psycopg import cursor
 from psycopg2.extras import RealDictCursor
 
 import connection
 import database_common
+
 
 DATA_FOLDER_PATH = os.getenv('DATA_FOLDER_PATH') if 'DATA_FOLDER_PATH' in os.environ else './'
 QUESTION_FILE = DATA_FOLDER_PATH + "question.csv"
@@ -17,6 +17,7 @@ QUESTIONS_HEADER = ['id', 'submission_time', 'view_number', 'vote_number', 'titl
 ANSWERS_HEADER = ['id', 'submission_time', 'vote_number', 'question_id', 'message', 'image']
 COMMENT_HEADER = ['id', 'question_id', 'answer_id', 'message', 'submission_time', 'edited_count']
 ALLOWED_EXTENSIONS = {'png', 'jpg'}
+
 
 @database_common.connection_handler
 def get_all_question(cursor: RealDictCursor):
@@ -35,7 +36,7 @@ def get_questions_by_id(cursor: RealDictCursor, id):
             FROM question
             WHERE id=%(id)s"""
     cursor.execute(query, {'id': id})
-    return cursor.fetchall()
+    return cursor.fetchone()
 
 
 @database_common.connection_handler
@@ -58,15 +59,19 @@ def get_all_answer(cursor: RealDictCursor) -> list:
     cursor.execute(query)
     return cursor.fetchall()
 
+
 @database_common.connection_handler
 def insert_to_database(cursor: RealDictCursor, new_question):
     query = """
-        INSERT INTO question
-        VALUES ('question_id_seq'::regclass, %(submission_time)s, %(view_number)s, %(vote_number)s, %(title)s, %(message)s, %(image)s)
+        INSERT INTO question (submission_time, view_number, vote_number, title, message, image)
+        VALUES (%(submission_time)s, %(view_number)s, %(vote_number)s, %(title)s, %(message)s, %(image)s)
+        RETURNING id;
         """
-    cursor.execute(query, {'submission_time': new_question['submission_time'], 'view_number': new_question['view_number'],
-                           'vote_number': new_question['vote_number'], 'title': new_question['title'],
-                           'message': new_question['message'], 'image': new_question['image']})
+    cursor.execute(query,
+                   {'submission_time': new_question['submission_time'], 'view_number': new_question['view_number'],
+                    'vote_number': new_question['vote_number'], 'title': new_question['title'],
+                    'message': new_question['message'], 'image': new_question['image']})
+    return cursor.fetchone().get('id')
 
 
 def get_random_id():
@@ -74,8 +79,9 @@ def get_random_id():
 
 
 def get_date_time():
-    time = datetime.datetime.now()
-    return str(time)
+    timee = time.ctime()
+    return timee
+
 
 @database_common.connection_handler
 def sort_all_question(cursor: RealDictCursor, request) -> list:
@@ -94,6 +100,13 @@ def create_question_form(generator, filename):  # 'id', 'submission_time', 'view
         my_list.insert(4, ins)
     return my_list
 
+@database_common.connection_handler
+def delete_question_with_answers(cursor: RealDictCursor, question_id):
+    query = """
+        DELETE FROM question
+        WHERE id=%(id)s
+    """
+    cursor.execute(query, {'id': question_id})
 
 def create_question_form(request, image_filename):  # 'id', 'submission_time', 'view_number', 'vote_number', 'title', 'message', 'image'
     my_dict = {'submission_time': get_date_time(), 'view_number': 0, 'vote_number': 0, 'image': image_filename,
@@ -179,7 +192,7 @@ def allowed_file(filename):
 
 
 @database_common.connection_handler
-def add_new_comment(question_id, answer_id, message):
+def add_new_comment(cursor: RealDictCursor, question_id, answer_id, message):
     # cursor.execute("""
     # INSERT INTO comment (question_id, answer_id, message, sumbission_time, edited_count)
     # VALUE (%(question_id)s, %(answer_id)s, %(message)s, %(submission_time)s, 0);
@@ -198,3 +211,8 @@ def add_new_comment(question_id, answer_id, message):
     params = {"question_id": question_id, "answer_id": answer_id, "message": message,
               "submission_time": get_date_time()}
     cursor.execute(quesry, params)
+
+@database_common.connection_handler
+def get_comment_by_id(question_id):
+
+
