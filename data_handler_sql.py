@@ -2,6 +2,7 @@ import datetime
 import os
 import uuid
 
+from psycopg2._psycopg import cursor
 from psycopg2.extras import RealDictCursor
 
 import connection
@@ -12,6 +13,7 @@ QUESTION_FILE = DATA_FOLDER_PATH + "question.csv"
 ANSWER_FILE = DATA_FOLDER_PATH + "answer.csv"
 QUESTIONS_HEADER = ['id', 'submission_time', 'view_number', 'vote_number', 'title', 'message', 'image']
 ANSWERS_HEADER = ['id', 'submission_time', 'vote_number', 'question_id', 'message', 'image']
+COMMENT_HEADER = ['id', 'question_id', 'answer_id', 'message', 'submission_time', 'edited_count']
 ALLOWED_EXTENSIONS = {'png', 'jpg'}
 
 @database_common.connection_handler
@@ -44,6 +46,8 @@ def get_answer_by_id(cursor: RealDictCursor, id) -> list:
     cursor.execute(query, {'id': id})
     return cursor.fetchall()
 
+
+
 @database_common.connection_handler
 def get_all_answer(cursor: RealDictCursor) -> list:
     query = """
@@ -59,6 +63,8 @@ def find_answer_by_id(id, file_name):
     for dic in answer:
         if id in dic['id']:
             return dic
+
+
 
 
 def get_random_id():
@@ -172,3 +178,19 @@ def add_new_comment(question_id, answer_id, message):
     params = {"question_id": question_id, "answer_id": answer_id, "message": message,
               "submission_time": get_date_time()}
     cursor.execute(quesry, params)
+
+@database_common.connection_handler
+def get_comment_by_id(cursor: RealDictCursor, id) -> list:
+    query = """
+        SELECT *
+        FROM comment
+        WHERE question_id =%(id)s
+    """
+    cursor.execute(query, {'id': id})
+    return cursor.fetchall()
+
+
+
+
+
+

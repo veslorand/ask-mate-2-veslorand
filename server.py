@@ -24,8 +24,9 @@ def list_questions():
 def question(question_id):
     question_by_id = data_handler.get_questions_by_id(question_id)
     all_answer = data_handler.get_all_answer()
+    #comment_by_id = data_handler.get_comment_by_id(id)
     return render_template("answer_list.html", question=question_by_id, header=data_handler.ANSWERS_HEADER,
-                           all_answer=all_answer)
+                           all_answer=all_answer, comment_header=data_handler.COMMENT_HEADER)
 
 @app.route('/add_new_question', methods=['POST', 'GET'])
 def add_new_question():
@@ -57,12 +58,12 @@ def add_new_answer(question_id):
         return redirect('/question/' + question_id)
     return render_template("add_new_answer.html", header=data_handler.ANSWERS_HEADER)
 
-@app.route('/question/<question_id>/new_question_comment', methods=['POST'])
+@app.route('/question/<question_id>/new_comment', methods=['POST'])
 def add_new_question_comment(question_id, answer_id, message):
     #get comment from request
     #send to database
     data_handler.add_new_comment(question_id, answer_id, message)
-    return render_template("add_new_comment.html", header=data_handler.QUESTIONS_HEADER)
+    return render_template("add_new_comment.html", header=data_handler.COMMENT_HEADER)
 
 @app.route('/question/<question_id>/delete')
 def delete_question(question_id):
