@@ -1,10 +1,8 @@
 import speech_recognition as sr
 from flask import Flask, render_template, request, redirect, url_for
-from werkzeug.utils import secure_filename
 
-import connection
+import connection_sql as connection
 import data_handler_sql as data_handler
-import os
 
 app = Flask(__name__)
 UPLOAD_FOLDER = '/home/veslorandpc/Desktop/projects/ask-mate-2-python-Kunand/static'
@@ -15,18 +13,18 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 @app.route("/list")
 def list_questions():
     if request.args:
-        all_question = data_handler.sort_all_question(request)
-        return render_template("question_list.html", all_question=all_question,
+        all_questions = data_handler.sort_all_question(request)
+        return render_template("question_list.html", all_question=all_questions,
                                header=data_handler.QUESTIONS_HEADER)
-    all_question = data_handler.get_all_question()
-    return render_template("question_list.html", all_question=all_question,
+    all_questions = connection.get_all_question()
+    return render_template("question_list.html", all_question=all_questions,
                            header=data_handler.QUESTIONS_HEADER)
 
 
 @app.route("/question/<question_id>")
 def question(question_id):
-    question_by_id = data_handler.get_questions_by_id(question_id)
-    all_answer = data_handler.get_all_answer()
+    question_by_id = connection.get_questions_by_id(question_id)
+    all_answer = connection.get_all_answer()
     comment_by_id = data_handler.get_comment_by_id(question_id)
     return render_template("answer_list.html", question=question_by_id, header=data_handler.ANSWERS_HEADER,
                            all_answer=all_answer, comment_header=data_handler.COMMENT_HEADER,
@@ -38,7 +36,7 @@ def add_new_question():
     # id,submission_time,view_number,vote_number,title,message,image
     if request.method == 'POST':
         new_question_data = data_handler.create_questions_form(request)
-        new_id = data_handler.insert_to_database_question(new_question_data)
+        new_id = connection.insert_to_database_question(new_question_data)
         return redirect(f"/question/{new_id}")
     return render_template("add_new_question.html", header=data_handler.QUESTIONS_HEADER)
 
@@ -48,7 +46,7 @@ def add_new_answer(question_id):
     # id, submission_time, vote_number, question_id, message, image
     if request.method == 'POST':
         new_answer_data = data_handler.create_answer_form(request, question_id)
-        data_handler.insert_to_database_answer(new_answer_data, question_id)
+        connection.insert_to_database_answer(new_answer_data, question_id)
         return redirect('/question/' + question_id)
     return render_template("add_new_answer.html", header=data_handler.ANSWERS_HEADER, question_id=question_id)
 
@@ -99,12 +97,23 @@ def vote_down_answer(answer_id):
 
 @app.route('/question/<question_id>/edit', methods=['POST', 'GET'])
 def edit_question(question_id):
-    question_by_id = data_handler.get_questions_by_id(question_id)
+    question_by_id = connection.get_questions_by_id(question_id)
     if request.method == 'POST':
         data_handler.edit_question(request, question_id)
         return redirect("/question/" + question_id)
     return render_template("edit_question.html", question_id=question_id, message=question_by_id.get('message'),
                            title=question_by_id.get('title'))
+
+
+@app.route('/search', methods=['POST', 'GET'])
+def search_questions():
+    if request.args:
+        all_question = data_handler.search_questions(request)
+        return render_template("question_list.html", all_question=all_question,
+                               header=data_handler.QUESTIONS_HEADER)
+    all_question = connection.get_all_question()
+    return render_template("question_list.html", all_question=all_question,
+                           header=data_handler.QUESTIONS_HEADER)
 
 
 @app.route('/speak', methods=['POST', 'GET'])
