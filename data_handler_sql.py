@@ -192,7 +192,7 @@ def allowed_file(filename):
 
 
 @database_common.connection_handler
-def add_new_comment(cursor: RealDictCursor, question_id, answer_id, message):
+def add_new_comment(cursor: RealDictCursor, request):
     # cursor.execute("""
     # INSERT INTO comment (question_id, answer_id, message, sumbission_time, edited_count)
     # VALUE (%(question_id)s, %(answer_id)s, %(message)s, %(submission_time)s, 0);
@@ -202,15 +202,20 @@ def add_new_comment(cursor: RealDictCursor, question_id, answer_id, message):
     # {"message": message},
     # {"submission_time": get_date_time()}
     # )
+    question_id = request.values.get('question_id')
+    answer_id = request.values.get('answer_id')
+   #if question_id:
 
-    quesry = \
+
+    query = \
         """
     INSERT INTO comment (question_id, answer_id, message, submission_time, edited_count) 
     VALUES (%(question_id)s, %(answer_id)s, %(message)s, %(submission_time)s, 0)
     """
     params = {"question_id": question_id, "answer_id": answer_id, "message": message,
               "submission_time": get_date_time()}
-    cursor.execute(quesry, params)
+    cursor.execute(query, params)
+
 
 @database_common.connection_handler
 def get_comment_by_id(cursor: RealDictCursor, id) -> list:
