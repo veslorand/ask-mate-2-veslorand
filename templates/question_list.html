@@ -4,11 +4,12 @@
     <title>Heroes of Code&Cool 3</title>
 {% endblock %}
 {% block body %}
-    <form action="/search">
+    <form action="/search" >
         <label for="search">Filter by word</label>
         <input id="search" type="text" name="search">
         <button type="submit">Search</button>
     </form>
+
     <table id="table">
         <thead>
         <tr>
@@ -46,7 +47,9 @@
                         </td>
                     {% elif i[0] != "title" %}
                         <td>
-                            {{ i[1] }}
+                        {% autoescape false %}
+                            {{ i[1]|replace(search, '<mark>' + search + '</mark>') if search else i[1]}}
+                        {% endautoescape %}
                         </td>
 
                     {% else %}
@@ -54,7 +57,6 @@
                             <a href="/question/{{ question_dict['id'] }}">{{ question_dict['title'] }}</a>
                             <a href="/question/{{ question_dict['id'] }}/edit">(edit)</a>
                             <a href="/question/{{ question_dict['id'] }}/delete">(del)</a>
-                            <a href="/question/{{ question_dict['id'] }}/new_comment">(comment)</a>
                         </td>
                     {% endif %}
                 {% endfor %}

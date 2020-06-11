@@ -50,6 +50,7 @@ def search_questions(cursor: RealDictCursor, request) -> list:
         ORDER BY id DESC
 """
     cursor.execute(query, {'search': "%"+request.args.get('search')+"%"})
+
     return cursor.fetchall()
 
 

@@ -114,5 +114,16 @@ def search_questions(cursor: RealDictCursor, request) -> list:
             FROM question, answer
             WHERE concat(question.title, question.message, answer.message) LIKE %(search)s
 """
-    cursor.execute(query, {'search': "%"+request.args.get('search')+"%"})
+    cursor.execute(query, {'search': "%" + request.args.get('search') + "%"})
+    return cursor.fetchall()
+
+
+@database_common.connection_handler
+def get_all_tags(cursor: RealDictCursor, question_id) -> list:
+    query = """
+                SELECT *
+                FROM tag
+                
+    """
+    cursor.execute(query)
     return cursor.fetchall()

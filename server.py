@@ -13,8 +13,9 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 @app.route("/list")
 def list_questions():
     if request.environ.get('PATH_INFO') == "/":
-        limit = connection.get_length_of_questions()
-        connection.get_all_question(limit.get('count'))
+        all_questions = connection.get_all_question(5)
+        return render_template("question_list.html", all_question=all_questions,
+                               header=data_handler.QUESTIONS_HEADER)
     if request.args:
         all_questions = data_handler.sort_all_question(request)
         return render_template("question_list.html", all_question=all_questions,
@@ -30,9 +31,10 @@ def question(question_id):
     question_by_id = connection.get_questions_by_id(question_id)
     all_answer = connection.get_all_answer()
     comment_by_id = data_handler.get_comment_by_id(question_id)
+    all_tag = [tag.get('name') for tag in connection.get_all_tags(connection.get_length_of_questions())]
     return render_template("answer_list.html", question=question_by_id, header=data_handler.ANSWERS_HEADER,
                            all_answer=all_answer, comment_header=data_handler.COMMENT_HEADER,
-                           comment_by_id=comment_by_id)
+                           comment_by_id=comment_by_id, all_tag=all_tag)
 
 
 @app.route('/answer/<answer_id>')
@@ -67,11 +69,8 @@ def add_new_answer(question_id):
 def add_new_question_comment(question_id):
     # get comment from request
     # send to database
-    print(request.method)
     if request.method == "POST":
         message = request.form['new_comment_message']
-        print(message)
-        print(question_id)
         data_handler.add_new_comment(question_id, message)
         return redirect("/question/" + question_id)
     return render_template('add_new_comment.html', question_id=question_id, header=data_handler.COMMENT_HEADER)
@@ -108,6 +107,7 @@ def delete_comment(question_id):
 
 
 
+
 @app.route('/question/<question_id>/delete')
 def delete_question(question_id):
     data_handler.delete_question_with_answers(question_id)
@@ -117,7 +117,7 @@ def delete_question(question_id):
 @app.route('/answer/<answer_id>/delete')
 def delete_answer(answer_id):
     data_handler.delete_answers(answer_id)
-    return redirect(f'{request.environ.get("HTTP_REFERER")}')  # f'/question/{all_answer["question_id"]}')
+    return redirect(f'{request.environ.get("HTTP_REFERER")}')
 
 
 
@@ -160,10 +160,15 @@ def search_questions():
     if request.args:
         all_question = data_handler.search_questions(request)
         return render_template("question_list.html", all_question=all_question,
-                               header=data_handler.QUESTIONS_HEADER)
+                               header=data_handler.QUESTIONS_HEADER, search=request.args.get('search'))
     all_question = connection.get_all_question()
     return render_template("question_list.html", all_question=all_question,
                            header=data_handler.QUESTIONS_HEADER)
+
+
+def tags():
+    all_tag = connection.get_all_tags()
+    return render_template("add_tag.html", tags=all_tag)
 
 
 @app.route('/speak', methods=['POST', 'GET'])
