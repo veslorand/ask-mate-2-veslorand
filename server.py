@@ -36,7 +36,7 @@ def question(question_id):
 
 
 @app.route('/answer/<answer_id>')
-def answer_comment(answer_id):
+def list_answer_comment(answer_id):
     comment_by_id = data_handler.get_answer_comment_by_id(answer_id)
     answer = connection.get_answer_by_id(answer_id)
     return render_template('comment_list.html', answer=answer, header=data_handler.COMMENT_HEADER,
@@ -77,6 +77,15 @@ def add_new_question_comment(question_id):
     return render_template('add_new_comment.html', question_id=question_id, header=data_handler.COMMENT_HEADER)
 
 
+@app.route('/answer/<answer_id>/new_comment', methods=['POST', 'GET'])
+def add_new_answer_comment(answer_id):
+    print(request.method)
+    if request.method == 'POST':
+        message = request.form['new_comment_message']
+        print(message)
+        data_handler.add_new_answer_comment(answer_id, message)
+        return redirect("/answer/" + answer_id)
+    return render_template("add_new_answer_comment.html", answer_id=answer_id, header=data_handler.COMMENT_HEADER)
 
 
 @app.route('/answer/<question_id>/delete')
