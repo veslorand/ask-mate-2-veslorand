@@ -12,11 +12,15 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 @app.route("/")
 @app.route("/list")
 def list_questions():
+    if request.environ.get('PATH_INFO') == "/":
+        limit = connection.get_length_of_questions()
+        connection.get_all_question(limit.get('count'))
     if request.args:
         all_questions = data_handler.sort_all_question(request)
         return render_template("question_list.html", all_question=all_questions,
                                header=data_handler.QUESTIONS_HEADER)
-    all_questions = connection.get_all_question()
+    limit = connection.get_length_of_questions()
+    all_questions = connection.get_all_question(limit.get('count'))
     return render_template("question_list.html", all_question=all_questions,
                            header=data_handler.QUESTIONS_HEADER)
 
