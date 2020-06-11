@@ -198,9 +198,9 @@ def get_answer_comment_by_id(cursor: RealDictCursor, answer_id) -> list:
     return cursor.fetchall()
 
 @database_common.connection_handler
-def delete_comment(cursor: RealDictCursor, question_id):
+def delete_comment(cursor: RealDictCursor, id):
     query = """
             DELETE FROM comment
             WHERE id=%(id)s
     """
-    cursor.execute(query, {'id': question_id})
+    cursor.execute(query, {'id': id})

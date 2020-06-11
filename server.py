@@ -91,7 +91,7 @@ def add_new_answer_comment(answer_id):
 @app.route('/answer/<question_id>/delete')
 def delete_comment(question_id):
     data_handler.delete_comment(question_id)
-    return redirect('/question/' + question_id)
+    return redirect('/')
 
 
 # @app.route('/new_comment', methods=['POST', 'GET'])
