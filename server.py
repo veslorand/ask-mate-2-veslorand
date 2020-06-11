@@ -5,7 +5,7 @@ import connection_sql as connection
 import data_handler_sql as data_handler
 
 app = Flask(__name__)
-UPLOAD_FOLDER = '/home/veslorandpc/Desktop/projects/ask-mate-2-python-Kunand/static'
+UPLOAD_FOLDER = '/home/nem/Documents/ask-mate-2-python-Kunand/static'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
@@ -35,6 +35,14 @@ def question(question_id):
                            comment_by_id=comment_by_id)
 
 
+@app.route('/answer/<answer_id>')
+def answer_comment(answer_id):
+    comment_by_id = data_handler.get_answer_comment_by_id(answer_id)
+    answer = connection.get_answer_by_id(answer_id)
+    return render_template('comment_list.html', answer=answer, header=data_handler.COMMENT_HEADER,
+                           comment_by_id=comment_by_id)
+
+
 @app.route('/add_new_question', methods=['POST', 'GET'])
 def add_new_question():
     # id,submission_time,view_number,vote_number,title,message,image
@@ -59,10 +67,37 @@ def add_new_answer(question_id):
 def add_new_question_comment(question_id):
     # get comment from request
     # send to database
-    if request.method == 'POST':
-        data_handler.add_new_comment(question_id, request)
-        return redirect("/", header=data_handler.COMMENT_HEADER)
-    return render_template('add_new_comment.html', header=data_handler.COMMENT_HEADER)
+    print(request.method)
+    if request.method == "POST":
+        message = request.form['new_comment_message']
+        print(message)
+        print(question_id)
+        data_handler.add_new_comment(question_id, message)
+        return redirect("/question/" + question_id)
+    return render_template('add_new_comment.html', question_id=question_id, header=data_handler.COMMENT_HEADER)
+
+
+
+
+@app.route('/answer/<question_id>/delete')
+def delete_comment(question_id):
+    data_handler.delete_comment(question_id)
+    return redirect('/question/' + question_id)
+
+
+# @app.route('/new_comment', methods=['POST', 'GET'])
+# def add_new_comment():
+#     # get comment from request
+#     # send to database
+#     print(request.method)
+#     if request.method == "POST":
+#         question_id = request.form['id']
+#         data_handler.add_new_comment(request)
+#         return redirect("/question/" + question_id)
+#     return render_template('add_new_comment.html', question_id=question_id, header=data_handler.COMMENT_HEADER)
+
+
+
 
 @app.route('/question/<question_id>/delete')
 def delete_question(question_id):
@@ -74,6 +109,7 @@ def delete_question(question_id):
 def delete_answer(answer_id):
     data_handler.delete_answers(answer_id)
     return redirect(f'{request.environ.get("HTTP_REFERER")}')  # f'/question/{all_answer["question_id"]}')
+
 
 
 @app.route('/question/<question_id>/vote-up')

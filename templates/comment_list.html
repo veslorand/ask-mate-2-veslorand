@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <title>Comment_list</title>
+{% endblock %}
+
+{% block body %}
+    <table border="1" width="1000" class="answer_table">
+        <thead>
+        <tr>
+            <th>{{ answer['title'] }}</th>
+
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>{{ answer['message'] }}</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <table border="1" width="1000" class="comment_tablee">
+        <thead>
+        <tr>
+            {% for i in comment_header %}
+                {% if i == "id" %}
+                    {{ continue }}
+                {% elif i == "question_id" %}
+                    {{ continue }}
+                {% elif i == "answer_id" %}}
+                    {{ continue }}
+                {% else %}
+                    <th>{{ i }}</th>
+                {% endif %}
+            {% endfor %}
+        </tr>
+        </thead>
+
+        <tbody>
+        {% for comment in comment_by_id %}
+            <tr>
+
+                {% for comment_key in comment.items() %}
+                    {% if comment_key[0] == 'id' %}
+                        {{ continue }}
+                        {% elif comment_key[0] == 'question_id' %}
+                        {{ continue }}
+                        {% else %}
+                    <td>
+                        {{ comment_key[1] }}
+                        {% endif %}
+
+
+                        </td>
+
+                 {% endfor %}
+
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

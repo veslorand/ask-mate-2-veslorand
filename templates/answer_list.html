@@ -56,11 +56,12 @@
                             {{ answer_key[1] }}
                             {% endif %}
                             {% if answer_key[0] == 'message' %}
+                                 <a href="/answer/{{ answer_dict['id'] }}">{{ answer_dict['message'] }}</a>
                                 <a href="/answer/{{ answer_dict['id'] }}/delete">(del)</a>
                             {% elif answer_key[0] == 'vote_number' %}
                                 <a href="/answer/{{ answer_dict['id'] }}/vote-up">(▲)</a>
                                 <a href="/answer/{{ answer_dict['id'] }}/vote-down">(▼)</a>
-                                <a href="/answer/{{ answer_dict['id'] }}/new_comment">Comment</a>
+                                <a href="/answer/{{ answer_dict['id'] }}/new_comment">(Comment)</a>
                             {% endif %}
                         </td>
 
@@ -101,8 +102,9 @@
                         <td>
                             {{ comment_key[1] }}
                             {% endif %}
-
-
+                            {% if comment_key[0] == 'message' %}
+                                <a href="/answer/{{ comment['question_id'] }}/delete">(del)</a>
+                            {% endif %}
                         </td>
 
                  {% endfor %}

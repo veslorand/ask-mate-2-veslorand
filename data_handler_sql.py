@@ -1,4 +1,6 @@
+from datetime import datetime
 import os
+import uuid
 import time
 import uuid
 
@@ -14,7 +16,7 @@ QUESTIONS_HEADER = ['id', 'submission_time', 'view_number', 'vote_number', 'titl
 ANSWERS_HEADER = ['id', 'submission_time', 'vote_number', 'question_id', 'message', 'image']
 COMMENT_HEADER = ['id', 'question_id', 'answer_id', 'edited_count', 'message', 'submission_time']
 ALLOWED_EXTENSIONS = {'png', 'jpg'}
-UPLOAD_FOLDER = '/home/veslorandpc/Desktop/projects/ask-mate-2-python-Kunand/static'
+UPLOAD_FOLDER = '/home/nem/Documents/ask-mate-2-python-Kunand/static'
 server.app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
@@ -67,6 +69,7 @@ def delete_answers(cursor: RealDictCursor, answer_id):
             WHERE id=%(id)s
         """
     cursor.execute(query, {'id': answer_id})
+
 
 
 @database_common.connection_handler
@@ -152,26 +155,14 @@ def allowed_file(filename):
 
 
 @database_common.connection_handler
-def add_new_comment(cursor: RealDictCursor, request):
-    # cursor.execute("""
-    # INSERT INTO comment (question_id, answer_id, message, sumbission_time, edited_count)
-    # VALUE (%(question_id)s, %(answer_id)s, %(message)s, %(submission_time)s, 0);
-    # """,
-    # {"question_id": question_id},
-    # {"answer_id": answer_id},
-    # {"message": message},
-    # {"submission_time": get_date_time()}
-    # )
-    question_id = request.values.get('question_id')
-    answer_id = request.values.get('answer_id')
-    message = request.values.get('message')
+def add_new_comment(cursor, question_id,  message):
 
     query = \
         """
     INSERT INTO comment (question_id, answer_id, message, submission_time, edited_count) 
     VALUES (%(question_id)s, %(answer_id)s, %(message)s, %(submission_time)s, 0)
     """
-    params = {"question_id": question_id, "answer_id": answer_id, "message": message,
+    params = {"question_id": question_id, "answer_id": None, "message": message,
               "submission_time": get_date_time()}
     cursor.execute(query, params)
 
@@ -185,3 +176,21 @@ def get_comment_by_id(cursor: RealDictCursor, id) -> list:
     """
     cursor.execute(query, {'id': id})
     return cursor.fetchall()
+
+@database_common.connection_handler
+def get_answer_comment_by_id(cursor: RealDictCursor, answer_id) -> list:
+    query = """
+        SELECT *
+        FROM comment
+        WHERE id=%(id)s
+    """
+    cursor.execute(query, {'id': answer_id})
+    return cursor.fetchall()
+
+@database_common.connection_handler
+def delete_comment(cursor: RealDictCursor, question_id):
+    query = """
+            DELETE FROM comment
+            WHERE id=%(id)s
+    """
+    cursor.execute(query, {'id': question_id})

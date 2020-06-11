@@ -5,7 +5,7 @@
 {% endblock %}
 {% block body %}
     <h1>Add new comment</h1>
-    <form method="post" action="/question/{{ question_id }}/new_comment">
+    <form method="POST" action="/question/{{ question_id }}/new_comment">
 
         <label for="new_comment">Type your comment here:</label><br>
         <textarea id="new_comment_message" name="new_comment_message" rows="8" cols="50"></textarea><br>
