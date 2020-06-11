@@ -5,7 +5,7 @@ import connection_sql as connection
 import data_handler_sql as data_handler
 
 app = Flask(__name__)
-UPLOAD_FOLDER = '/home/nem/Documents/ask-mate-2-python-Kunand/static'
+UPLOAD_FOLDER = '/home/veslorandpc/Desktop/projects/ask-mate-2-python-Kunand/static'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 

@@ -16,7 +16,7 @@ QUESTIONS_HEADER = ['id', 'submission_time', 'view_number', 'vote_number', 'titl
 ANSWERS_HEADER = ['id', 'submission_time', 'vote_number', 'question_id', 'message', 'image']
 COMMENT_HEADER = ['id', 'question_id', 'answer_id', 'edited_count', 'message', 'submission_time']
 ALLOWED_EXTENSIONS = {'png', 'jpg'}
-UPLOAD_FOLDER = '/home/nem/Documents/ask-mate-2-python-Kunand/static'
+UPLOAD_FOLDER = '/home/veslorandpc/Desktop/projects/ask-mate-2-python-Kunand/static'
 server.app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
