@@ -39,22 +39,22 @@
         <tbody>
         {% for comment in comment_by_id %}
             <tr>
+                {% if comment['answer_id'] == answer['id'] %}
+                    {% for comment_key in comment.items() %}
+                        {% if comment_key[0] == 'id' %}
+                            {{ continue }}
+                            {% elif comment_key[0] == 'question_id' %}
+                            {{ continue }}
+                            {% else %}
+                        <td>
+                            {{ comment_key[1] }}
+                            {% endif %}
 
-                {% for comment_key in comment.items() %}
-                    {% if comment_key[0] == 'id' %}
-                        {{ continue }}
-                        {% elif comment_key[0] == 'question_id' %}
-                        {{ continue }}
-                        {% else %}
-                    <td>
-                        {{ comment_key[1] }}
-                        {% endif %}
 
-
-                        </td>
+                    </td>
 
                  {% endfor %}
-
+                {% endif %}
             </tr>
         {% endfor %}
         </tbody>
