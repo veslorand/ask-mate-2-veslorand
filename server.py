@@ -51,13 +51,14 @@ def add_new_answer(question_id):
     return render_template("add_new_answer.html", header=data_handler.ANSWERS_HEADER, question_id=question_id)
 
 
-@app.route('/question/<question_id>/new_comment', methods=['POST'])
-def add_new_question_comment(question_id, answer_id, message):
+@app.route('/question/<question_id>/new_comment', methods=['POST', 'GET'])
+def add_new_question_comment(question_id):
     # get comment from request
     # send to database
-    data_handler.add_new_comment(question_id, answer_id, message)
-    return render_template("add_new_comment.html", header=data_handler.COMMENT_HEADER)
-
+    if request.method == 'POST':
+        data_handler.add_new_comment(question_id, request)
+        return redirect("/", header=data_handler.COMMENT_HEADER)
+    return render_template('add_new_comment.html', header=data_handler.COMMENT_HEADER)
 
 @app.route('/question/<question_id>/delete')
 def delete_question(question_id):
