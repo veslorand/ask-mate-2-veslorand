@@ -4,13 +4,25 @@ import database_common
 
 
 @database_common.connection_handler
-def get_all_question(cursor: RealDictCursor):
-    query = """
+def get_all_question(cursor: RealDictCursor, limit):
+    query = f"""
             SELECT *
             FROM question
-            ORDER BY submission_time"""
-    cursor.execute(query)
+            ORDER BY submission_time
+            LIMIT %(limit)s
+            """
+    cursor.execute(query, {'limit': limit})
     return cursor.fetchall()
+
+
+@database_common.connection_handler
+def get_length_of_questions(cursor: RealDictCursor):
+    query = """
+            SELECT COUNT(*)
+            FROM question
+                """
+    cursor.execute(query)
+    return cursor.fetchone()
 
 
 @database_common.connection_handler
