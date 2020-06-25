@@ -43,8 +43,8 @@ background-color: lightsalmon;
 }
 
 body {
-    background-image: url("/static/HH3.png");
-    background-size: 85%;
+    background-image: url("/static/H3folder/unnamed.jpg");
+    background-size: contain;
     background-repeat: no-repeat;
 }
 

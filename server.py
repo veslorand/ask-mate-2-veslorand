@@ -67,8 +67,6 @@ def add_new_answer(question_id):
 
 @app.route('/question/<question_id>/new_comment', methods=['POST', 'GET'])
 def add_new_question_comment(question_id):
-    # get comment from request
-    # send to database
     if request.method == "POST":
         message = request.form['new_comment_message']
         data_handler.add_new_comment(question_id, message)
@@ -93,21 +91,6 @@ def delete_comment(question_id):
     return redirect('/')
 
 
-# @app.route('/new_comment', methods=['POST', 'GET'])
-# def add_new_comment():
-#     # get comment from request
-#     # send to database
-#     print(request.method)
-#     if request.method == "POST":
-#         question_id = request.form['id']
-#         data_handler.add_new_comment(request)
-#         return redirect("/question/" + question_id)
-#     return render_template('add_new_comment.html', question_id=question_id, header=data_handler.COMMENT_HEADER)
-
-
-
-
-
 @app.route('/question/<question_id>/delete')
 def delete_question(question_id):
     data_handler.delete_question_with_answers(question_id)
@@ -118,7 +101,6 @@ def delete_question(question_id):
 def delete_answer(answer_id):
     data_handler.delete_answers(answer_id)
     return redirect(f'{request.environ.get("HTTP_REFERER")}')
-
 
 
 @app.route('/question/<question_id>/vote-up')
@@ -227,7 +209,6 @@ def speak():
                     if "answer" in text:  # TO New answer
                         return redirect(request.environ['HTTP_REFERER'] + "/new-answer")
 
-                print("Szeva")
                 return redirect('/')
             except:
                 print("Sorry i didn't understand it my Lord!")
@@ -239,5 +220,5 @@ def speak():
 if __name__ == "__main__":
     app.run(
         host='0.0.0.0',
-        port=8000,
+        port=8001,
         debug=True, )

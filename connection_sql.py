@@ -123,7 +123,6 @@ def get_all_tags(cursor: RealDictCursor, question_id) -> list:
     query = """
                 SELECT *
                 FROM tag
-                
     """
     cursor.execute(query)
     return cursor.fetchall()
