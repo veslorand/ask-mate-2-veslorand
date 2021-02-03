@@ -1,0 +1,63 @@
+#magic_button {
+    size: 20px;
+    background-color: #ff0004;
+    width: 400px;
+    position: relative;
+    top: 680px;
+    left: 1110px;
+    font-weight: bold;
+    font-size: 30px;
+
+}
+.answer_table {
+    background-color: #ffa07a;
+
+
+}
+
+.comment_tablee{
+    background-color: #ffa07a;
+}
+.answer_tablee {
+    background-color: #ffa07a;
+
+
+}
+#nav_table {
+    background-color: #9C1A1C;
+    opacity: 90%;
+    position: relative;
+    top: 500px;
+    left: 435px;
+}
+
+.link :visited{
+    color: black;
+}
+.htag {
+    background-color: lightsalmon;
+}
+
+#nav_table {
+background-color: lightsalmon;
+}
+
+body {
+    background-image: url("/static/H3folder/unnamed.jpg");
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+#table {
+    background-color: #ffa07a;
+    position: relative;
+    top: 275px;
+    font-size: 20px;
+    max-width: 1080px;
+    font-weight: bold;
+    color: #060a38;
+}
+
+#body {
+    background-color: #9C1A1C;
+}

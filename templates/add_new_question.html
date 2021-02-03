@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <title>Add new question</title>
+{% endblock %}
+{% block body %}
+    <h1>Add new question</h1>
+    <form method="post" action="/add_new_question" enctype=multipart/form-data>
+
+        <label for="new_question_title">Title:</label><br>
+        <input type="text" name="new_question_title" id="new_question_title"><br>
+
+        <label for="new_question">Type your question here:</label><br>
+        <textarea id="new_question_message" name="new_question_message" rows="8" cols="50"></textarea><br>
+
+        <input type=file name=file>
+        <input type=submit value="Add new question">
+
+    </form>
+    <a href="/">Back to main</a>
+{% endblock %}

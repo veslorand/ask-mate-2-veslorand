@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <title>Add new comment</title>
+{% endblock %}
+{% block body %}
+    <h1>Add new comment</h1>
+    <form method="POST" action="/answer/{{ answer_id }}/new_comment">
+
+        <label for="new_comment">Type your comment here:</label><br>
+        <textarea id="new_comment_message" name="new_comment_message" rows="8" cols="50"></textarea><br>
+
+        <button type="submit">Add new comment</button>
+    </form>
+    <a href="/">Back to main</a>
+{% endblock %}

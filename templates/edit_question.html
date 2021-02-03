@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <title>Edit question</title>
+{% endblock %}
+{% block body %}
+    <h1>Edit question</h1>
+    <form method="post" action="/question/{{ question_id }}/edit">
+
+        <label for="edited_question_title">Title:</label><br>
+        <input type="text" name="edited_question_title" id="edited_question_title" value="{{ title }}"><br>
+
+        <label for="edited_question_message">Type your question here:</label><br>
+        <textarea id="edited_question_message" name="edited_question_message" rows="8" cols="50">{{ message }}</textarea><br>
+
+        <button type="submit">Edit question</button>
+    </form>
+    <a href="/">Back to main</a>
+{% endblock %}
