@@ -1,1 +1,0 @@
-# ask-mate-2-veslorand
